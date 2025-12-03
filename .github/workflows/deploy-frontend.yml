@@ -1,9 +1,13 @@
 name: Build and Deploy Frontend (GitHub Pages)
 
-# Trigger on pushes to main (change branch if you use 'master')
+# Trigger on pushes to main
 on:
   push:
     branches: [ main ]
+
+# request repository contents write permission for the GITHUB_TOKEN
+permissions:
+  contents: write
 
 jobs:
   build-and-deploy:
@@ -12,6 +16,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # persist credentials so subsequent git push can use GITHUB_TOKEN
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Use Node.js 20
         uses: actions/setup-node@v4
@@ -31,5 +39,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
+          # use the default token (GITHUB_TOKEN). The workflow `permissions` above must allow write.
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./frontend/dist
